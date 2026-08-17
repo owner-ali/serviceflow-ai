@@ -1,0 +1,17 @@
+{
+  "name": "serviceflow-ai",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/web",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace=apps/web",
+    "build:web": "npm run build --workspace=apps/web",
+    "test:web": "npm run test --workspace=apps/web",
+    "db:reset": "supabase db reset",
+    "db:push": "supabase db push",
+    "functions:deploy": "supabase functions deploy ai-proxy whatsapp-sender fcm-sender stripe-webhook automation-trigger"
+  }
+}

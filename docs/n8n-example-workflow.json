@@ -1,0 +1,74 @@
+{
+  "name": "ServiceFlow AI — New Booking to Review Request",
+  "nodes": [
+    {
+      "name": "Webhook: booking_created",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": { "path": "{{automation_id}}", "httpMethod": "POST" }
+    },
+    {
+      "name": "AI Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/ai-proxy",
+        "method": "POST",
+        "jsonBody": "={\"type\":\"service_analysis\",\"input\":{\"problem_description\":$json.record.problem_description}}"
+      }
+    },
+    {
+      "name": "Assign Technician",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/bookings?id=eq.{{$json.record.id}}",
+        "method": "PATCH",
+        "jsonBody": "={\"technician_id\": $json.suggested_technician_id}"
+      }
+    },
+    {
+      "name": "WhatsApp: Booking Confirmed",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/whatsapp-sender",
+        "method": "POST",
+        "jsonBody": "={\"to\": $json.customer_phone, \"template\": \"booking_confirmation\", \"params\": [$json.customer_name, $json.booking_code, $json.scheduled_date]}"
+      }
+    },
+    {
+      "name": "Wait 24 Hours",
+      "type": "n8n-nodes-base.wait",
+      "parameters": { "amount": 24, "unit": "hours" }
+    },
+    {
+      "name": "WhatsApp: Reminder",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/whatsapp-sender",
+        "method": "POST",
+        "jsonBody": "={\"to\": $json.customer_phone, \"template\": \"appointment_reminder\", \"params\": [$json.scheduled_time]}"
+      }
+    },
+    {
+      "name": "Wait for job_completed",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": { "path": "{{automation_id}}-completed", "httpMethod": "POST" }
+    },
+    {
+      "name": "WhatsApp: Review Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/whatsapp-sender",
+        "method": "POST",
+        "jsonBody": "={\"to\": $json.customer_phone, \"template\": \"review_request\", \"params\": [$json.review_link]}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook: booking_created": { "main": [[{ "node": "AI Analysis" }]] },
+    "AI Analysis": { "main": [[{ "node": "Assign Technician" }]] },
+    "Assign Technician": { "main": [[{ "node": "WhatsApp: Booking Confirmed" }]] },
+    "WhatsApp: Booking Confirmed": { "main": [[{ "node": "Wait 24 Hours" }]] },
+    "Wait 24 Hours": { "main": [[{ "node": "WhatsApp: Reminder" }]] },
+    "WhatsApp: Reminder": { "main": [[{ "node": "Wait for job_completed" }]] },
+    "Wait for job_completed": { "main": [[{ "node": "WhatsApp: Review Request" }]] }
+  }
+}

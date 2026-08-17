@@ -1,0 +1,10 @@
+{
+  "name": "@serviceflow/api",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "@serviceflow/types": "*"
+  }
+}

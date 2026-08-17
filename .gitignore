@@ -1,0 +1,15 @@
+node_modules/
+.next/
+build/
+dist/
+*.log
+.env
+.env.local
+.DS_Store
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/ios/Pods/
+**/android/.gradle/
+supabase/.branches/
+supabase/.temp/

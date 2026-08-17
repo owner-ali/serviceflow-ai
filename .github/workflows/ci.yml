@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  web:
+    name: Web app — lint, test, build (Demo Mode)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Build (Demo Mode — no real Supabase project needed for CI)
+        run: npm run build
+        env:
+          NEXT_PUBLIC_DEMO_MODE: 'true'
+
+  customer-app:
+    name: Customer app (Flutter) — analyze, test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/customer-app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+  technician-app:
+    name: Technician app (Flutter) — analyze, test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/technician-app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+  sql-lint:
+    name: Validate migration SQL syntax
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        # Supabase's own Postgres image — includes the auth schema, postgis,
+        # and other extensions the migrations depend on (auth.users, postgis),
+        # which a vanilla postgres:15 image does not have.
+        image: supabase/postgres:15.1.0.117
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply migrations against a throwaway Supabase Postgres instance
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          for f in supabase/migrations/*.sql; do
+            echo "Applying $f"
+            PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f "$f" || exit 1
+          done
+        env:
+          PGPASSWORD: postgres

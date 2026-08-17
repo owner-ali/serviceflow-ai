@@ -1,0 +1,57 @@
+project_id = "serviceflow-ai"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/**"]
+jwt_expiry = 3600
+enable_signup = true
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[storage.buckets.profile-images]
+public = true
+
+[storage.buckets.service-images]
+public = true
+
+[storage.buckets.booking-attachments]
+public = false
+
+[storage.buckets.before-after-media]
+public = false
+
+[storage.buckets.invoices]
+public = false
+
+[storage.buckets.signatures]
+public = false
+
+[functions.ai-proxy]
+verify_jwt = true
+
+[functions.whatsapp-sender]
+verify_jwt = false
+
+[functions.fcm-sender]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.automation-trigger]
+verify_jwt = false
