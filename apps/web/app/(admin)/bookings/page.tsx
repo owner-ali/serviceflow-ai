@@ -57,7 +57,7 @@ export default function BookingsPage() {
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'bookings', filter: `business_id=eq.${businessId}` },
-          async (payload) => {
+          async (payload: { new: Booking }) => {
             await load();
             const id = (payload.new as Booking)?.id;
             if (id) {

@@ -53,7 +53,7 @@ export default function AdminChatPage() {
 
     supabase
       .channel(`admin_chat_${room.id}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `chat_room_id=eq.${room.id}` }, (payload) => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `chat_room_id=eq.${room.id}` }, (payload: { new: Message }) => {
         setMessages((prev) => [...prev, payload.new as Message]);
       })
       .subscribe();
