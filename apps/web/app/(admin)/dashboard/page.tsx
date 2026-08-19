@@ -103,10 +103,10 @@ export default function DashboardPage() {
         .eq('business_id', bizId);
 
       const revenue = (invoices ?? [])
-        .filter((i) => i.payment_status === 'paid')
-        .reduce((sum, i) => sum + Number(i.total), 0);
-      const pendingPayments = (invoices ?? []).filter((i) => i.payment_status === 'pending').length;
-      const ratings = (reviews ?? []).map((r) => r.overall_rating).filter(Boolean) as number[];
+        .filter((i: { total: number; payment_status: string }) => i.payment_status === 'paid')
+        .reduce((sum: number, i: { total: number }) => sum + Number(i.total), 0);
+      const pendingPayments = (invoices ?? []).filter((i: { payment_status: string }) => i.payment_status === 'pending').length;
+      const ratings = (reviews ?? []).map((r: { overall_rating: number | null }) => r.overall_rating).filter(Boolean) as number[];
       const avgRating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
 
       setStats({
