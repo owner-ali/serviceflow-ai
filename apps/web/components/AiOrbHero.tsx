@@ -66,6 +66,20 @@ export default function AiOrbHero() {
           <br />
           <span className="text-mint">One intelligent flow.</span>
         </motion.h1>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="pointer-events-auto mt-8"
+        >
+          <a
+            href="#book"
+            className="inline-block rounded-xl bg-emerald-600 px-8 py-3 text-sm font-medium text-white transition-transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-600/30"
+          >
+            Book a Service
+          </a>
+        </motion.div>
       </div>
 
       <div className="pointer-events-none absolute inset-0 hidden md:block">

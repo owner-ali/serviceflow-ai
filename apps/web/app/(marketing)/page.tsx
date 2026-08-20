@@ -2,6 +2,7 @@ import AiOrbHero from '@/components/AiOrbHero';
 import ProductCarousel from '@/components/ProductCarousel';
 import Reveal from '@/components/Reveal';
 import ScrollProgress from '@/components/ScrollProgress';
+import PublicBookingForm from '@/components/PublicBookingForm';
 
 const FEATURES = [
   { icon: '⚡', title: 'AI Service Analysis', desc: 'Instant triage from the problem description and photos — priority, skills, and price range before a technician even leaves.' },
@@ -17,6 +18,17 @@ export default function MarketingPage() {
     <main>
       <ScrollProgress />
       <AiOrbHero />
+
+      <section id="book" className="bg-forest-900 px-6 py-24">
+        <Reveal className="mb-10 text-center">
+          <p className="text-xs uppercase tracking-widest text-mint">Get started</p>
+          <h2 className="mt-2 text-3xl font-semibold">Book a service in minutes</h2>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <PublicBookingForm />
+        </Reveal>
+      </section>
+
       <ProductCarousel />
 
       <section className="mx-auto max-w-5xl px-6 py-24">
